@@ -7,11 +7,11 @@ CREATE TABLE reading_points (
   rplinecolor text,
   rpvisibility integer,
   unique(rpname)
-)
+);
 
 CREATE TABLE sensor_readings (
   id integer primary key autoincrement not null,
   sensorid integer not null,
   timestamp datetime not null,
-  sensorvalue real not null,
-)
+  sensorvalue real not null
+);

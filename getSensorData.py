@@ -37,7 +37,7 @@ def arduinoWorker():
             cursor = conn.cursor()
             #logging.debug('connected')
             #cursor.execute('update task set priority = priority + 1')
-            cursor.execute('insert into sensor_readings (sensorid,timestamp,sensorvalue) values(?, ?, ?)', [(1, timestamp, readings[1])])
+            cursor.execute('insert into sensor_readings (sensorid,timestamp,sensorvalue) values(?, ?, ?)', [(1), (timestamp), (readings[1])])
             #logging.debug('changes made')
             #logging.debug('waiting to synchronize')
             ready.wait()  # synchronize
