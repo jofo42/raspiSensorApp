@@ -10,8 +10,8 @@ CREATE TABLE reading_points (
 )
 
 CREATE TABLE sensor_readings (
-  id integer primary key,
+  id integer primary key autoincrement not null,
   sensorid integer not null,
   timestamp datetime not null,
-  sensorvalue integer not null,
+  sensorvalue real not null,
 )
