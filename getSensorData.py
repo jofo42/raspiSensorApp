@@ -2,71 +2,64 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3 as lite
-import sys
 import serial
 import re
 import subprocess
-from time import sleep
+import threading
+import logging
+import time
 from datetime import datetime
 
-#arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=9600, timeout=2)
+logging.basicConfig(level=logging.INFO,
+                    format='[%(levelname)s] (%(threadName)-10s) %(message)s',
+                    )
+
+arduino = serial.Serial(port='/dev/ttyUSB0', baudrate=9600, timeout=2)
 
 con = None
 
-try:
-    con = lite.connect('sensordata.db')
 
-    with con:
+def arduinoWorker():
+    while True:
+        readings = arduino.readline().strip().split('\t')
+        logging.debug("%s", readings)
+        if len(readings) != 2:
+		time.sleep(3)
+		continue
+	timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    	logging.info("Arduino: %s: t = %s C, h= %s %%" % (timestamp, readings[1], readings[0]))
+    	time.sleep(60)
 
-        cur = con.cursor()
 
-        cur.execute('SELECT SQLITE_VERSION()')
+def raspiPiWorker():
+    while True:
+        # Run the DHT program to get the humidity and temperature readings!
 
-        data = cur.fetchone()
+        output = subprocess.check_output(["./Adafruit_DHT", "11", "4"])
+        #print output
+	logging.debug("%s", output)
+        matches = re.search("Temp =\s+([0-9.]+)", output)
+        if (not matches):
+            time.sleep(3)
+            continue
+        temp = float(matches.group(1))
 
-        print "SQLite version: %s" % data
+        # search for humidity printout
+        matches = re.search("Hum =\s+([0-9.]+)", output)
+        if (not matches):
+            time.sleep(3)
+            continue
+        humidity = float(matches.group(1))
 
-        #cur.execute("CREATE TABLE data(date TEXT, temp INTEGER, hum INTEGER)")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        #print "Temperature: %.1f C" % temp
+        #print "Humidity:    %.1f %%" % humidity
+        logging.info("RaspberryPi: %s: t = %s C, h= %s %%" % (timestamp, temp, humidity))
+        time.sleep(60)
 
-        while True:
-            while True:
-                # Run the DHT program to get the humidity and temperature readings!
 
-                output = subprocess.check_output(["./Adafruit_DHT", "11", "4"])
-                print output
-                matches = re.search("Temp =\s+([0-9.]+)", output)
-                if (not matches):
-                  sleep(3)
-                  continue
-                temp = float(matches.group(1))
+a = threading.Thread(name='arduino', target=arduinoWorker)
+r = threading.Thread(name='raspberrypi', target=raspiPiWorker)
 
-                # search for humidity printout
-                matches = re.search("Hum =\s+([0-9.]+)", output)
-                if (not matches):
-                  sleep(3)
-                  continue
-                humidity = float(matches.group(1))
-
-                print "Temperature: %.1f C" % temp
-                print "Humidity:    %.1f %%" % humidity
-
-#            while True:
-#                readings = arduino.readline().strip().split('\t')
-#            	print readings
-#                if len(readings) == 2:
-#                    break
-#            time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#            print "%s: t = %s C, h= %s %%" % (time, readings[1], readings[0])
-#            sleep(60)
-            #cur.execute("INSERT INTO data(date, temp, hum) VALUES(?, ?, ?)", (time, readings[1], readings[0]))
-            #con.commit()
-
-except lite.Error, e:
-
-    print "Error %s:" % e.args[0]
-    sys.exit(1)
-
-finally:
-
-    if con:
-        con.close()
+a.start()
+r.start()
