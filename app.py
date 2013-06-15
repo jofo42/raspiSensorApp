@@ -12,7 +12,9 @@ from gevent.pywsgi import WSGIServer
 from flask import Flask, request, render_template, jsonify
 from gevent import monkey
 
-import datetime, json, time
+import datetime
+import json
+import time
 
 app = Flask(__name__)
 app.debug = True
@@ -23,7 +25,7 @@ monkey.patch_all()
 import sqlite3
 from flask import g
 
-DATABASE = '/home/fohring/temperature.db'
+DATABASE = '/home/fohring/development/raspiSensorApp/temperature.db'
 #DATABASE_SALON = '../monitor_serial_git/salon.db'
 #DATABASE_TOBACCO = '../monitor_serial_git/temps_w_tobacco.db'
 
