@@ -68,6 +68,14 @@ def raspiPiWorker():
         #print "Temperature: %.1f C" % temp
         #print "Humidity:    %.1f %%" % humidity
         logging.info("RaspberryPi: %s: t = %s C, h= %s %%" % (timestamp, temp, humidity))
+        with sqlite3.connect(db_filename, isolation_level=isolation_level) as conn:
+            cursor = conn.cursor()
+            #logging.debug('connected')
+            #cursor.execute('update task set priority = priority + 1')
+            cursor.execute('insert into sensor_readings (sensorid,timestamp,sensorvalue) values(?, ?, ?)', [(2), (timestamp), (readings[1])])
+            #logging.debug('changes made')
+            #logging.debug('waiting to synchronize')
+            ready.wait()  # synchronize
         time.sleep(60)
 
 if __name__ == '__main__':
