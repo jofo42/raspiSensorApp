@@ -31,7 +31,8 @@ def arduinoWorker():
         if len(readings) != 2:
             time.sleep(3)
             continue
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        #timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.now()
         logging.info("Arduino: %s: t = %s C, h= %s %%" % (timestamp, readings[1], readings[0]))
         with sqlite3.connect(db_filename, isolation_level=isolation_level) as conn:
             cursor = conn.cursor()

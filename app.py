@@ -79,8 +79,8 @@ def api_live():
         ws = request.environ['wsgi.websocket']
         while True:
             readings = query_db(DATABASE, 'SELECT * FROM sensor_readings ORDER BY timestamp DESC limit 1', convert_date=False)
-            result = readings[2]
-            result[0] = date_from_timestamp(result[0])
+            result = readings[0]
+            #result[2] = date_from_timestamp(result[2])
             if len(result) < 4:
                 result.append('na')
             ws.send(json.dumps({'latest': result}))

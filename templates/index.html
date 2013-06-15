@@ -13,10 +13,10 @@
                 ws.onmessage = function (msg) {
                     console.log(msg.data);
                     data = JSON.parse(msg.data);
-                    $('#ts').html(data.latest[0])
-                    $('#temp').html(data.latest[1] + '°')
-                    $('#h1').html(data.latest[2] + '%')
-                    $('#h2').html(data.latest[3])
+                    $('#ts').html(data.latest[2])
+                    $('#temp').html(data.latest[3] + '°')
+                    //$('#h1').html(data.latest[2] + '%')
+                    //$('#h2').html(data.latest[3])
                 };
             } else {
                 alert("WebSocket not supported");
