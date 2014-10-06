@@ -78,7 +78,7 @@ def api_live():
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
         while True:
-            readings = query_db(DATABASE, 'SELECT * FROM sensor_readings ORDER BY timestamp DESC limit 1', convert_date=False)
+            readings = query_db(DATABASE, 'SELECT * FROM sensor_readings WHERE sensor_id = 1 ORDER BY timestamp DESC limit 1', convert_date=False)
             result = readings[0]
             #result[2] = date_from_timestamp(result[2])
             if len(result) < 4:
@@ -92,11 +92,12 @@ def api_live():
 def api():
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
-        readings = query_db(DATABASE, 'SELECT * FROM sensor_readings ORDER BY timestamp DESC')
+        readings_living = query_db(DATABASE, 'SELECT * FROM sensor_readings WHERE sensor_id = 1 ORDER BY timestamp DESC')
+        readings_sleeping = query_db(DATABASE, 'SELECT * FROM sensor_readings WHERE sensor_id = 2 ORDER BY timestamp DESC')
 #        readings_salon = query_db(DATABASE_SALON, 'SELECT * FROM readings ORDER BY ts DESC')
 #        readings_tobacco = query_db(DATABASE_TOBACCO, 'SELECT * FROM readings ORDER BY ts DESC')
         #ws.send(json.dumps({'en_cours': readings, 'salon': readings_salon, 'tobacco' : readings_tobacco}))
-        ws.send(json.dumps({'en_cours': readings}))
+        ws.send(json.dumps({'living': readings_living, 'sleeping': readings_sleeping}))
     return jsonify({'status': 'ok'})
 
 if __name__ == '__main__':
